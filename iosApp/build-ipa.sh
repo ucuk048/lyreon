@@ -13,7 +13,16 @@ cd "$ROOT_DIR"
 echo "[LYREON] 1. Kompilasi KMP iOS Framework (iosArm64)..."
 ./gradlew :ios:linkReleaseFrameworkIosArm64 --no-daemon
 
-FRAMEWORK_DIR="$ROOT_DIR/ios/build/binaries/iosArm64/releaseFramework/LyreonApp.framework"
+FRAMEWORK_DIR="$(find "$ROOT_DIR/ios/build" -type d -name "LyreonApp.framework" 2>/dev/null | head -n 1)"
+if [ -z "$FRAMEWORK_DIR" ] || [ ! -d "$FRAMEWORK_DIR" ]; then
+    echo "[ERROR] Framework LyreonApp.framework tidak ditemukan di $ROOT_DIR/ios/build"
+    echo "Isi direktori $ROOT_DIR/ios/build:"
+    find "$ROOT_DIR/ios/build" -maxdepth 5 2>/dev/null || true
+    exit 1
+fi
+
+echo "[LYREON] Menemukan framework di: $FRAMEWORK_DIR"
+FRAMEWORK_PARENT="$(dirname "$FRAMEWORK_DIR")"
 OUTPUT_DIR="$ROOT_DIR/build/ipa"
 PAYLOAD_DIR="$OUTPUT_DIR/Payload"
 APP_DIR="$PAYLOAD_DIR/Lyreon.app"
@@ -31,7 +40,7 @@ SDK_PATH="$(xcrun --sdk iphoneos --show-sdk-path)"
 swiftc "$DIR/iOSApp.swift" \
     -target arm64-apple-ios16.0 \
     -sdk "$SDK_PATH" \
-    -F "$ROOT_DIR/ios/build/binaries/iosArm64/releaseFramework" \
+    -F "$FRAMEWORK_PARENT" \
     -framework LyreonApp \
     -framework UIKit \
     -framework AVFoundation \
