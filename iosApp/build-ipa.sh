@@ -38,6 +38,7 @@ echo "[LYREON] 3. Kompilasi launcher Swift native..."
 SDK_PATH="$(xcrun --sdk iphoneos --show-sdk-path)"
 
 swiftc "$DIR/iOSApp.swift" \
+    -parse-as-library \
     -target arm64-apple-ios16.0 \
     -sdk "$SDK_PATH" \
     -F "$FRAMEWORK_PARENT" \
