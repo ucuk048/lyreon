@@ -42,6 +42,7 @@ fun SpotifyImportDialog(
 
     var url by remember { mutableStateOf("") }
     var isLoadingMetadata by remember { mutableStateOf(false) }
+    var loadingStatusText by remember { mutableStateOf<String?>("Mengekstrak playlist dari Spotify...") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var playlist by remember { mutableStateOf<SpotifyPlaylist?>(null) }
 
@@ -73,9 +74,12 @@ fun SpotifyImportDialog(
 
         scope.launch {
             isLoadingMetadata = true
+            loadingStatusText = "Mengekstrak playlist dari Spotify..."
             errorMessage = null
             try {
-                val pl = SpotifyScraper.fetchPlaylist(id)
+                val pl = SpotifyScraper.fetchPlaylist(id) { loaded, total ->
+                    loadingStatusText = "Mengekstrak playlist Spotify ($loaded/$total trek)..."
+                }
                 playlist = pl
                 totalCount = pl.tracks.size
             } catch (e: Exception) {
@@ -223,7 +227,7 @@ fun SpotifyImportDialog(
                         )
                         Spacer(Modifier.width(10.dp))
                         Text(
-                            text = "Mengekstrak playlist dari Spotify...",
+                            text = loadingStatusText ?: "Mengekstrak playlist dari Spotify...",
                             fontSize = 12.sp,
                             color = LyreonTextSecondary
                         )

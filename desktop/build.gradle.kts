@@ -50,6 +50,8 @@ dependencies {
     implementation("org.openjfx:javafx-graphics:$jfxVersion:$targetJfxPlatform")
     implementation("org.openjfx:javafx-media:$jfxVersion:$targetJfxPlatform")
     implementation("org.openjfx:javafx-swing:$jfxVersion:$targetJfxPlatform")
+
+    testImplementation(kotlin("test"))
 }
 
 kotlin {
