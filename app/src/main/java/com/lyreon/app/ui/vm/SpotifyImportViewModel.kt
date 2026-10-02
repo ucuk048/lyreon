@@ -112,8 +112,8 @@ class SpotifyImportViewModel(private val locator: ServiceLocator) : ViewModel() 
                 }
             }
 
-            if (matchedTracks.isNotEmpty()) {
-                locator.library.batchAddToPlaylist(playlistId, matchedTracks)
+            for (track in matchedTracks) {
+                locator.library.addToPlaylist(playlistId, track)
             }
 
             _state.update {

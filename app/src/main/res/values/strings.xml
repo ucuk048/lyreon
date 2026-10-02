@@ -377,4 +377,22 @@
     <string name="history_queue_body">Lagu yang baru diputar ikut mengisi antrean saat radio kehabisan lagu, dan saat aplikasi dibuka tanpa sesi tersimpan.</string>
     <string name="action_append_queue">+ ANTRE</string>
     <string name="action_saved">TERSIMPAN</string>
+
+    <!-- Spotify Import -->
+    <string name="spotify_import_kicker">SPOTIFY IMPORT</string>
+    <string name="spotify_import_title">Impor Playlist Spotify</string>
+    <string name="spotify_import_hint">https://open.spotify.com/playlist/…</string>
+    <string name="spotify_import_paste">Tempel</string>
+    <string name="spotify_import_fetching">Mengambil metadata Spotify…</string>
+    <string name="spotify_import_progress">Mencocokkan %1$d dari %2$d: %3$s</string>
+    <string name="spotify_import_saved_action">Buka Playlist</string>
+    <string name="spotify_import_load">MUAT PLAYLIST</string>
+    <string name="spotify_import_play_now">PUTAR SEKARANG</string>
+    <string name="spotify_import_save">SIMPAN KE PUSTAKA</string>
+
+    <!-- Version Outdated Screen -->
+    <string name="version_outdated_title">Pembaruan Tersedia</string>
+    <string name="version_outdated_msg">Versi Anda (%1$s) telah kedaluwarsa. Versi minimal yang diperlukan adalah %2$s. Silakan perbarui aplikasi untuk melanjutkan.</string>
+    <string name="version_outdated_update">PERBARUI SEKARANG</string>
+    <string name="version_outdated_exit">KELUAR</string>
 </resources>

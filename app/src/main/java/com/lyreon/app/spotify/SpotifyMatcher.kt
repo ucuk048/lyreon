@@ -40,11 +40,11 @@ object SpotifyMatcher {
 
         // 2. Fallback pencarian biasa bila musicSearch tidak menemukan hasil
         if (candidates.isEmpty()) {
-            val fallbackSearch = runCatching {
-                ytRepo.search(query, SearchFilter.SONGS)
+            val fallbackTracks = runCatching {
+                ytRepo.searchTracks(query, 20)
             }.getOrNull()
-            if (fallbackSearch != null && fallbackSearch.tracks.isNotEmpty()) {
-                candidates.addAll(fallbackSearch.tracks)
+            if (!fallbackTracks.isNullOrEmpty()) {
+                candidates.addAll(fallbackTracks)
             }
         }
 
