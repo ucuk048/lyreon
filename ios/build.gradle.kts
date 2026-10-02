@@ -13,7 +13,12 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "LyreonApp"
             isStatic = true
+            freeCompilerArgs += listOf("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
         }
+    }
+
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
     }
 
     sourceSets {

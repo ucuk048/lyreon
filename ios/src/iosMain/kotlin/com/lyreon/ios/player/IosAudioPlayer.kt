@@ -1,3 +1,5 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+
 package com.lyreon.ios.player
 
 import com.lyreon.ios.model.LyreonTrack
@@ -41,6 +43,7 @@ class IosAudioPlayerImpl : AudioPlayer {
 
     private val scope = CoroutineScope(Dispatchers.Default + Job())
     private var avPlayer: AVPlayer? = null
+    private var currentItem: AVPlayerItem? = null
     private var progressJob: Job? = null
 
     private val _currentTrack = MutableStateFlow<LyreonTrack?>(null)
@@ -129,6 +132,7 @@ class IosAudioPlayerImpl : AudioPlayer {
                 val streamUrl = "https://music.youtube.com/watch?v=${track.id}"
                 val nsUrl = NSURL.URLWithString(streamUrl) ?: return@launch
                 val playerItem = AVPlayerItem(uRL = nsUrl)
+                this.currentItem = playerItem
                 
                 if (avPlayer == null) {
                     avPlayer = AVPlayer(playerItem = playerItem)
@@ -200,7 +204,7 @@ class IosAudioPlayerImpl : AudioPlayer {
                 val player = avPlayer
                 if (player != null && _isPlaying.value) {
                     val currentSec = CMTimeGetSeconds(player.currentTime())
-                    val totalSec = player.currentItem?.duration?.let { CMTimeGetSeconds(it) } ?: 0.0
+                    val totalSec = currentItem?.duration?.let { CMTimeGetSeconds(it) } ?: 0.0
                     if (!currentSec.isNaN() && currentSec >= 0) {
                         _positionMs.value = (currentSec * 1000.0).toLong()
                     }
