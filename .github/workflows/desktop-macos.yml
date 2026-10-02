@@ -2,7 +2,7 @@ name: Build Lyreon Desktop for macOS (Apple Silicon ARM64)
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [ master, main, source ]
     paths:
       - 'desktop/**'
       - '.github/workflows/desktop-macos.yml'
@@ -27,7 +27,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build macOS DMG and PKG
-        run: ./gradlew :desktop:packageDmg :desktop:packagePkg :desktop:packageMacArm64Jar --no-daemon
+        run: ./gradlew :desktop:packageDmg :desktop:packagePkg :desktop:packageMacArm64Jar -PtargetPlatform=mac-aarch64 --no-daemon
 
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v4

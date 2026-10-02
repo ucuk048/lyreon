@@ -30,13 +30,26 @@ dependencies {
     // JSON parsing
     implementation("org.json:json:20240303")
 
-    // JavaFX Media for native audio playback on Windows & macOS (Apple Silicon & Intel)
+    // JavaFX Media for native audio playback
+    // Use target/host platform classifier to prevent bundling conflicting foreign-arch native libraries (e.g. x86_64 dylib into ARM64 JVM)
     val jfxVersion = "21.0.2"
-    listOf("win", "mac", "mac-aarch64").forEach { platform ->
-        implementation("org.openjfx:javafx-base:$jfxVersion:$platform")
-        implementation("org.openjfx:javafx-graphics:$jfxVersion:$platform")
-        implementation("org.openjfx:javafx-media:$jfxVersion:$platform")
+    val osName = System.getProperty("os.name", "").lowercase()
+    val osArch = System.getProperty("os.arch", "").lowercase()
+
+    val targetJfxPlatform = when {
+        project.hasProperty("targetPlatform") -> project.property("targetPlatform").toString()
+        osName.contains("mac") || osName.contains("darwin") -> {
+            if (osArch == "aarch64" || osArch == "arm64") "mac-aarch64" else "mac"
+        }
+        osName.contains("win") -> "win"
+        osName.contains("linux") -> "linux"
+        else -> "win"
     }
+
+    implementation("org.openjfx:javafx-base:$jfxVersion:$targetJfxPlatform")
+    implementation("org.openjfx:javafx-graphics:$jfxVersion:$targetJfxPlatform")
+    implementation("org.openjfx:javafx-media:$jfxVersion:$targetJfxPlatform")
+    implementation("org.openjfx:javafx-swing:$jfxVersion:$targetJfxPlatform")
 }
 
 kotlin {
@@ -68,6 +81,18 @@ compose.desktop {
                 appStore = false
                 iconFile.set(project.file("src/main/resources/icon.icns"))
                 packageBuildVersion = "3.5.0"
+
+                infoPlist {
+                    extraKeysRawXml = """
+                        <key>NSAppTransportSecurity</key>
+                        <dict>
+                            <key>NSAllowsArbitraryLoads</key>
+                            <true/>
+                            <key>NSAllowsLocalNetworking</key>
+                            <true/>
+                        </dict>
+                    """.trimIndent()
+                }
             }
 
             windows {
