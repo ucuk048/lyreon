@@ -1,0 +1,39 @@
+name: Build Lyreon for iOS (.ipa)
+
+on:
+  push:
+    branches: [ source ]
+    paths:
+      - 'ios/**'
+      - 'iosApp/**'
+      - '.github/workflows/ios-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build-ios-ipa:
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+          architecture: 'aarch64'
+          cache: 'gradle'
+
+      - name: Make Scripts Executable
+        run: |
+          chmod +x gradlew
+          chmod +x iosApp/build-ipa.sh
+
+      - name: Build iOS IPA
+        run: ./iosApp/build-ipa.sh
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lyreon-iOS-IPA
+          path: Lyreon-3.5.0.ipa

@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 rootProject.name = "Lyreon"
 include(":app")
 include(":desktop")
+include(":ios")
