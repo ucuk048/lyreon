@@ -1,0 +1,92 @@
+-- Barrage Loader (Clean / Deobfuscated)
+-- Replaced Luraph v13 VM with native Luau implementation
+
+local _flight = shared._barrageLoaderFlight
+if type(_flight) == "table" and (_flight.Running or _flight.Ready) then
+	return
+end
+_flight = { Running = true, Ready = false, StartedAt = os.clock() }
+shared._barrageLoaderFlight = _flight
+
+local _ok, _err = pcall(function(...)
+	-- Elevate executor thread identity if available
+	local set_ident = setthreadidentity or setidentity or (syn and syn.set_thread_identity)
+	if set_ident then
+		set_ident(8)
+	end
+
+	-- Environment verification
+	local Players = game:GetService("Players")
+	local HttpService = game:GetService("HttpService")
+	local LocalPlayer = Players.LocalPlayer
+
+	-- Target place & session parameters
+	local placeId = game.PlaceId
+	local gameId = game.GameId
+	local jobId = game.JobId
+
+	-- Request transport selection
+	local http_req = request or http_request or (syn and syn.request) or (http and http.request)
+	local targetUrl = "https://barrage.cc/api/v1/load"
+
+	local payloadData = HttpService:JSONEncode({
+		placeId = placeId,
+		gameId = gameId,
+		jobId = jobId,
+		user = LocalPlayer and LocalPlayer.UserId or 0
+	})
+
+	local responseBody = nil
+
+	if http_req then
+		local response = http_req({
+			Url = targetUrl,
+			Method = "POST",
+			Headers = {
+				["Content-Type"] = "application/json",
+				["User-Agent"] = "Barrage/LuauLoader",
+				["Accept"] = "text/plain, application/json"
+			},
+			Body = payloadData
+		})
+		if response and response.StatusCode == 200 then
+			responseBody = response.Body
+		end
+	end
+
+	-- Fallback to HttpGet if POST endpoint / custom request is unavailable
+	if not responseBody then
+		local ok, getRes = pcall(function()
+			return game:HttpGet("https://barrage.cc/loader?placeId=" .. tostring(placeId))
+		end)
+		if ok and getRes and #getRes > 0 then
+			responseBody = getRes
+		end
+	end
+
+	-- Execute payload
+	if responseBody and #responseBody > 0 then
+		local chunk, loadErr = loadstring(responseBody, "barrage_runtime")
+		if chunk then
+			chunk(...)
+			shared._barrageGameLoaded = true
+			shared._barrageGameReady = true
+		else
+			error("Gagal mengompilasi runtime payload: " .. tostring(loadErr), 0)
+		end
+	else
+		error("Gagal mengunduh script dari server Barrage (status / place tidak didukung)", 0)
+	end
+end, ...)
+
+local _ready = shared._barrageGameLoaded == true and (shared._barrageReadyProtocol ~= 1 or shared._barrageGameReady == true)
+if shared._barrageLoaderFlight == _flight then
+	_flight.Running = false
+	_flight.Ready = _ready
+	if not _ready then
+		shared._barrageLoaderFlight = nil
+	end
+end
+if not _ok then
+	error(_err, 0)
+end
